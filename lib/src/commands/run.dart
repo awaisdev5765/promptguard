@@ -35,6 +35,21 @@ class RunCommand extends Command<int> {
         'env-lookup',
         help: 'Override environment lookup (for tests).',
         hide: true,
+      )
+      ..addFlag(
+        'parallel',
+        abbr: 'p',
+        negatable: false,
+        help: 'Run tests concurrently.',
+      )
+      ..addOption(
+        'snapshots',
+        help: 'Directory for output snapshots (golden files). Enables snapshot checks.',
+      )
+      ..addFlag(
+        'update-snapshots',
+        negatable: false,
+        help: 'Write current outputs as the new snapshots.',
       );
   }
 
@@ -77,8 +92,15 @@ class RunCommand extends Command<int> {
     final registry = defaultRegistry(envLookup);
     final runner = PromptGuardRunner(registry);
 
-    stdout.writeln('Running ${suite.tests.length} prompt tests…');
-    final report = await runner.runSuite(suite);
+    final parallel = argResults!['parallel'] == true;
+    stdout.writeln(
+        'Running ${suite.tests.length} prompt tests${parallel ? ' (parallel)' : ''}…');
+    final report = await runner.runSuite(
+      suite,
+      parallel: parallel,
+      snapshotDir: argResults?['snapshots'] as String?,
+      updateSnapshots: argResults!['update-snapshots'] == true,
+    );
 
     if (argResults!['json'] == true) {
       stdout.writeln(_toJson(report));
@@ -117,6 +139,15 @@ class RunCommand extends Command<int> {
     }
     final total = report.total;
     final failed = report.failures;
+    final usage = report.totalUsage;
+    if (usage.totalTokens > 0) {
+      final cost = report.totalCostUsd;
+      final costText = cost > 0 && cost < 0.01
+          ? cost.toStringAsFixed(4)
+          : cost.toStringAsFixed(2);
+      stdout.writeln(
+          'Tokens: ${usage.promptTokens} in / ${usage.completionTokens} out (est. \$$costText)');
+    }
     stdout.writeln();
     if (failed == 0) {
       stdout.writeln('All $total prompt tests passed.');

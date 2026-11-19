@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0
+
+- **Output snapshots** — golden files for LLM output: `--snapshots <dir>` compares,
+  `--update-snapshots` accepts new outputs. Catches subtle drift in generation.
+- **Parallel execution** — `--parallel` runs the suite concurrently.
+- **`promptguard watch`** — re-runs the suite on every save while you tune prompts.
+- **Token & cost report** — every run prints tokens in/out and estimated USD cost
+  (known model prices built in; override per model in the config `pricing:` section).
+- **GitHub Action Marketplace entry** — `action.yml` composite action: use
+  `uses: awaisdev5765/promptguard@v0` instead of copy-pasting workflow YAML.
+
 ## 0.1.0
 
 - Initial release.

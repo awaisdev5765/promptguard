@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import '../core/pricing.dart';
 import 'provider.dart';
 
 /// OpenAI-compatible chat completions. Works with api.openai.com and any
@@ -19,7 +20,7 @@ class OpenAICompatibleProvider extends Provider {
   });
 
   @override
-  Future<String> complete({
+  Future<CompletionResult> complete({
     required String model,
     required String system,
     required String user,
@@ -54,7 +55,8 @@ class OpenAICompatibleProvider extends Provider {
       if (choices == null || choices.isEmpty) {
         throw StateError('No choices in response: ${_clip(text, 300)}');
       }
-      return ((choices.first as Map)['message'] as Map)['content'] as String;
+      final content = ((choices.first as Map)['message'] as Map)['content'] as String;
+      return CompletionResult(text: content, usage: usageFromOpenAI(json));
     } finally {
       client.close();
     }
@@ -69,7 +71,7 @@ class AnthropicProvider extends Provider {
   AnthropicProvider({required this.apiKeyEnv, required this.envLookup});
 
   @override
-  Future<String> complete({
+  Future<CompletionResult> complete({
     required String model,
     required String system,
     required String user,
@@ -103,7 +105,8 @@ class AnthropicProvider extends Provider {
       }
       final json = jsonDecode(text) as Map<String, dynamic>;
       final content = json['content'] as List;
-      return ((content.first as Map)['text'] ?? '') as String;
+      final message = ((content.first as Map)['text'] ?? '') as String;
+      return CompletionResult(text: message, usage: usageFromAnthropic(json));
     } finally {
       client.close();
     }
@@ -118,7 +121,7 @@ class GeminiProvider extends Provider {
   GeminiProvider({required this.apiKeyEnv, required this.envLookup});
 
   @override
-  Future<String> complete({
+  Future<CompletionResult> complete({
     required String model,
     required String system,
     required String user,
@@ -152,7 +155,8 @@ class GeminiProvider extends Provider {
       final candidates = json['candidates'] as List;
       final parts =
           ((candidates.first as Map)['content'] as Map)['parts'] as List;
-      return ((parts.first as Map)['text'] ?? '') as String;
+      final message = ((parts.first as Map)['text'] ?? '') as String;
+      return CompletionResult(text: message, usage: usageFromGemini(json));
     } finally {
       client.close();
     }

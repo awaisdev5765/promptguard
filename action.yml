@@ -1,0 +1,67 @@
+name: 'PromptGuard'
+description: >-
+  Regression-test your app's AI features: runs your promptguard.yaml suite
+  and comments the pass/fail report on the pull request.
+branding:
+  icon: 'shield'
+  color: 'blue'
+inputs:
+  config:
+    description: 'Path to promptguard.yaml'
+    required: false
+    default: 'promptguard.yaml'
+  openai_api_key:
+    description: 'OpenAI API key'
+    required: false
+  anthropic_api_key:
+    description: 'Anthropic API key'
+    required: false
+  gemini_api_key:
+    description: 'Gemini API key'
+    required: false
+  groq_api_key:
+    description: 'Groq API key'
+    required: false
+  openrouter_api_key:
+    description: 'OpenRouter API key'
+    required: false
+  parallel:
+    description: 'Run tests concurrently'
+    required: false
+    default: 'true'
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      run: |
+        echo "::group::Install promptguard"
+        dart pub global activate promptguard
+        echo "::endgroup::"
+      # dart must already be on PATH (use dart-lang/setup-dart before this action)
+    - if: ${{ inputs.openai_api_key != '' }}
+      shell: bash
+      run: echo "OPENAI_API_KEY=${{ inputs.openai_api_key }}" >> "$GITHUB_ENV"
+    - if: ${{ inputs.anthropic_api_key != '' }}
+      shell: bash
+      run: echo "ANTHROPIC_API_KEY=${{ inputs.anthropic_api_key }}" >> "$GITHUB_ENV"
+    - if: ${{ inputs.gemini_api_key != '' }}
+      shell: bash
+      run: echo "GEMINI_API_KEY=${{ inputs.gemini_api_key }}" >> "$GITHUB_ENV"
+    - if: ${{ inputs.groq_api_key != '' }}
+      shell: bash
+      run: echo "GROQ_API_KEY=${{ inputs.groq_api_key }}" >> "$GITHUB_ENV"
+    - if: ${{ inputs.openrouter_api_key != '' }}
+      shell: bash
+      run: echo "OPENROUTER_API_KEY=${{ inputs.openrouter_api_key }}" >> "$GITHUB_ENV"
+    - id: run
+      shell: bash
+      run: |
+        ARGS=""
+        if [ "${{ inputs.parallel }}" = "true" ]; then ARGS="--parallel"; fi
+        promptguard run --config "${{ inputs.config }}" $ARGS --output report.md
+    - if: always()
+      shell: bash
+      run: |
+        if [ -f report.md ]; then
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+        fi

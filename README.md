@@ -157,14 +157,22 @@ spill fixing a bad prompt weeks later.
 
 ## Project status
 
-`v0.1.0` — core is stable and unit-tested with fake providers (no API
-key needed to develop). Roadmap:
+`v0.2.0` — everything below is shipped and unit-tested (13 tests, fake
+providers, no API keys needed to develop):
 
-- [ ] Output snapshots with `--update-snapshots` (golden files for LLM output)
-- [ ] GitHub Action Marketplace entry
-- [ ] `promptguard watch` — re-run on file change while tuning prompts
-- [ ] Parallel test execution
-- [ ] Token/cost report per run
+- ✅ Output snapshots — golden files for LLM output: `--snapshots <dir>`,
+  accept changes with `--update-snapshots`
+- ✅ GitHub Action Marketplace entry — `uses: awaisdev5765/promptguard@v0`
+  (composite action, see `action.yml`)
+- ✅ `promptguard watch` — re-run on every save while tuning prompts
+- ✅ Parallel test execution — `--parallel`
+- ✅ Token/cost report per run — tokens + estimated USD, prices built in
+
+Roadmap next:
+
+- [ ] `--fail-on <n>` threshold gates
+- [ ] Model A/B mode: run the same inputs on two models, diff the results
+- [ ] Provider plugins via config scripts
 
 ## The audit suite
 

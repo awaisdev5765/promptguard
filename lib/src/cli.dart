@@ -3,6 +3,7 @@
 import 'package:args/command_runner.dart';
 
 import 'commands/example.dart';
+import 'commands/watch.dart';
 import 'commands/init.dart';
 import 'commands/run.dart';
 
@@ -16,7 +17,8 @@ Future<int> run(List<String> arguments) async {
   )
     ..addCommand(buildRunCommand())
     ..addCommand(buildInitCommand())
-    ..addCommand(buildExampleCommand());
+    ..addCommand(buildExampleCommand())
+    ..addCommand(buildWatchCommand());
 
   try {
     return await runner.run(arguments) ?? 0;

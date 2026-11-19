@@ -8,11 +8,11 @@ class FakeProvider implements Provider {
   FakeProvider(this.response);
 
   @override
-  Future<String> complete({
+  Future<CompletionResult> complete({
     required String model,
     required String system,
     required String user,
-  }) async => response;
+  }) async => CompletionResult(text: response);
 }
 
 PromptTest _test(List<Expectation> expectations) => PromptTest(

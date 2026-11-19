@@ -3,7 +3,7 @@ description: >-
   Regression testing for every AI feature in your app. Define prompts and
   expectations in one YAML file, run them against any provider, and catch
   silent quality regressions in CI before your users do.
-version: 0.1.0
+version: 0.2.0
 repository: https://github.com/awaisdev5765/promptguard
 issue_tracker: https://github.com/awaisdev5765/promptguard/issues
 homepage: https://github.com/awaisdev5765/promptguard
